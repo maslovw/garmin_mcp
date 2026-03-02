@@ -101,7 +101,10 @@ def call_tool(app, tool_name, raw_args):
     args = parser.parse_args(raw_args)
     arguments = {k: v for k, v in vars(args).items() if v is not None}
 
-    result, _ = asyncio.run(app.call_tool(tool_name, arguments))
+    result = asyncio.run(app.call_tool(tool_name, arguments))
+    # Handle both tuple (newer MCP) and sequence (older MCP) return types
+    if isinstance(result, tuple):
+        result = result[0]
     for content in result:
         text = content.text
         # Pretty-print if it's JSON
